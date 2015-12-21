@@ -1,38 +1,37 @@
 (ns ^:figwheel-always looops.core
     (:require
-              [reagent.core :as reagent :refer [atom]]
-              [looops.fake-data :as fake]))
-
-(defonce feed (atom fake/data))
+     [looops.session :as session]
+     [reagent.core :as reagent :refer [atom]]
+     [secretary.core :as secretary :refer-macros [defroute]]
+     [looops.views.feed :refer [feed-view]]
+     [looops.views.upload :refer [upload-view]]
+     [goog.events :as events]
+     [goog.history.EventType :as EventType])
+    (:import goog.History))
 
 (enable-console-print!)
 
-;; define your app data so that it doesn't get over-written on reload
+(let [history (History.)
+      navigation EventType/NAVIGATE]
+  (goog.events/listen history
+                      navigation
+                      #(-> % .-token secretary/dispatch!))
+  (doto history (.setEnabled true)))
 
-(defn song-view [song]
-  [:div
-   [:p (:song-name song)]])
+(defroute "/" []
+  (session/put! :current-view feed-view))
 
-(defn album-view [album]
-  [:div
-   [:h1 (:title album)]
-   [:h2 (:artist album)]
-   (map song-view (:songs album))])
+(defroute "/upload" []
+  (session/put! :current-view upload-view))
 
-(defn feed-view []
-  [:div
-   (map album-view @feed)])
+(defn page []
+  [(session/get :current-view)])
 
-;;(defn hello-world []
-;;  [:h1 (:text @app-state)])
+(defn init! []
+  (secretary/set-config! :prefix "#")
+  (session/put! :current-view feed-view)
+  (reagent/render-component
+   [page]
+   (.getElementById js/document "app")))
 
-(reagent/render-component [feed-view]
-                          (. js/document (getElementById "app")))
-
-
-(defn on-js-reload []
-  ;; optionally touch your app-state to force rerendering depending on
-  ;; your application
-  ;; (swap! app-state update-in [:__figwheel_counter] inc)
-)
-
+(init!)
