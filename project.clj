@@ -8,6 +8,8 @@
                  [org.clojure/clojurescript "1.7.122"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [secretary "1.2.3"]
+                 [hum "0.4.0"]
+                 [cljs-ajax "0.5.2"]
                  [reagent "0.5.0"]]
 
   :plugins [[lein-cljsbuild "1.1.0"]
