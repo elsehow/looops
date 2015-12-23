@@ -7,6 +7,7 @@
      [looops.views.upload :refer [upload-view]]
      [goog.events :refer [listen]]
      [goog.history.EventType :refer [NAVIGATE]])
+     ;[devtools.core :as devtools])
     (:import goog.History))
 
 (enable-console-print!)
@@ -39,3 +40,8 @@
    (.getElementById js/document "app")))
 
 (init!)
+
+;(devtools/set-pref! :install-sanity-hints true) ; this is optional
+;(devtools/install!)
+
+;(.log js/console (range 200))

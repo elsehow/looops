@@ -1,7 +1,11 @@
 (ns looops.session
   (:refer-clojure :exclude [get])
   (:require
-   [reagent.core :as reagent :refer [atom cursor]]))
+   [reagent.core :as reagent :refer [atom cursor]]
+   [hum.core :as hum]))
+
+(def context 
+  (hum/create-context))
 
 (defonce app-db (atom {:feed 
    {:103050539 {:title "too far"
@@ -11,18 +15,18 @@
                                      :source nil
                                      :playing? false
                                      :fade 1300}
-                          :0afd093k {
-                                     :song-name "good song 2"
+                          :0afd093k {:song-name "good song 2"
                                      :url "/music/dr.wav"
                                      :source nil
                                      :playing? false
                                      :fade 0}
-                          :9035093 {
-                                    :song-name "truly excellent song"
+                          :9035093 {:song-name "truly excellent song"
                                     :url "/music/1.wav"
                                      :source nil
                                     :playing? false
                                     :fade 5000}}}}}))
+(defn now []
+  (.-currentTime context))
 
 (defn cursor-to [keys]
   (cursor app-db keys))

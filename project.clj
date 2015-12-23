@@ -10,6 +10,7 @@
                  [secretary "1.2.3"]
                  [hum "0.4.0"]
                  [cljs-ajax "0.5.2"]
+                 [binaryage/devtools "0.4.1"]
                  [reagent "0.5.0"]]
 
   :plugins [[lein-cljsbuild "1.1.0"]
