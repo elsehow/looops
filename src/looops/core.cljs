@@ -36,12 +36,7 @@
   (secretary/set-config! :prefix "#")
   (session/put! :current-view feed-view)
   (render-component
-   [page]
-   (.getElementById js/document "app")))
+    [page]
+    (.getElementById js/document "app")))
 
 (init!)
-
-;(devtools/set-pref! :install-sanity-hints true) ; this is optional
-;(devtools/install!)
-
-;(.log js/console (range 200))
