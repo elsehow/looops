@@ -1,72 +1,134 @@
 (defproject looops "0.1.0-SNAPSHOT"
-  :description "FIXME: write this!"
+  :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies [[org.clojure/clojure "1.7.0"]
-                 [org.clojure/clojurescript "1.7.122"]
-                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
-                 [re-frame "0.6.0"]
+                 [ring-server "0.4.0"]
+                 [reagent "0.5.1"
+                  :exclusions [org.clojure/tools.reader]]
+                 [reagent-forms "0.5.13"]
+                 [reagent-utils "0.1.7"]
+                 [ring "1.4.0"]
+                 [ring/ring-defaults "0.1.5"]
+                 [compojure "1.4.0"]
+                 [hiccup "1.0.5"]
+                 [environ "1.0.1"]
+                 [org.clojure/clojurescript "1.7.170" :scope "provided"]
                  [secretary "1.2.3"]
-                 [hum "0.4.0"]
-                 [cljs-ajax "0.5.2"]
-                 [binaryage/devtools "0.4.1"]
-                 [reagent "0.5.0"]]
+                 [venantius/accountant "0.1.6"
+                  :exclusions [org.clojure/tools.reader]]
+                 
+                 ]
 
-  :plugins [[lein-cljsbuild "1.1.0"]
-            [lein-figwheel "0.3.9"]]
+  :plugins [[lein-environ "1.0.1"]
+            [lein-cljsbuild "1.1.1"]
+            [lein-asset-minifier "0.2.4"
+             :exclusions [org.clojure/clojure]]]
 
-  :source-paths ["src"]
+  :ring {:handler looops.handler/app
+         :uberwar-name "looops.war"}
 
-  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
+  :min-lein-version "2.5.0"
 
-  :cljsbuild {
-    :builds [{:id "dev"
-              :source-paths ["src"]
+  :uberjar-name "looops.jar"
 
-              :figwheel { :on-jsload "looops.core/on-js-reload" }
+  :main looops.server
 
-              :compiler {:main looops.core
-                         :asset-path "js/compiled/out"
-                         :output-to "resources/public/js/compiled/looops.js"
-                         :output-dir "resources/public/js/compiled/out"
-                         :source-map-timestamp true }}
-             {:id "min"
-              :source-paths ["src"]
-              :compiler {:output-to "resources/public/js/compiled/looops.js"
-                         :main looops.core
-                         :optimizations :advanced
-                         :pretty-print false}}]}
+  :clean-targets ^{:protect false} [:target-path
+                                    [:cljsbuild :builds :app :compiler :output-dir]
+                                    [:cljsbuild :builds :app :compiler :output-to]]
 
-  :figwheel {
-             ;; :http-server-root "public" ;; default and assumes "resources" 
-             ;; :server-port 3449 ;; default
-             ;; :server-ip "127.0.0.1" 
+  :source-paths ["src/clj" "src/cljc"]
+  :resource-paths ["resources" "target/cljsbuild"]
 
-             :css-dirs ["resources/public/css"] ;; watch and update CSS
+  :minify-assets
+  {:assets
+   {"resources/public/css/site.min.css" "resources/public/css/site.css"}}
 
-             ;; Start an nREPL server into the running figwheel process
-             ;; :nrepl-port 7888
+  :cljsbuild {:builds {:app {:source-paths ["src/cljs" "src/cljc"]
+                             :compiler {:output-to "target/cljsbuild/public/js/app.js"
+                                        :output-dir "target/cljsbuild/public/js/out"
+                                        :asset-path   "js/out"
+                                        :optimizations :none
+                                        :pretty-print  true}}}}
 
-             ;; Server Ring Handler (optional)
-             ;; if you want to embed a ring handler into the figwheel http-kit
-             ;; server, this is for simple ring servers, if this
-             ;; doesn't work for you just run your own server :)
-             ;; :ring-handler hello_world.server/handler
+  :profiles {:dev {:repl-options {:init-ns looops.repl}
 
-             ;; To be able to open files in your editor from the heads up display
-             ;; you will need to put a script on your path.
-             ;; that script will have to take a file path and a line number
-             ;; ie. in  ~/bin/myfile-opener
-             ;; #! /bin/sh
-             ;; emacsclient -n +$2 $1
-             ;;
-             ;; :open-file-command "myfile-opener"
+                   :dependencies [[ring/ring-mock "0.3.0"]
+                                  [ring/ring-devel "1.4.0"]
+                                  [prone "0.8.3"]
+                                  [lein-figwheel "0.5.0-2"
+                                   :exclusions [org.clojure/core.memoize
+                                                ring/ring-core
+                                                org.clojure/clojure
+                                                org.ow2.asm/asm-all
+                                                org.clojure/data.priority-map
+                                                org.clojure/tools.reader
+                                                org.clojure/clojurescript
+                                                org.clojure/core.async
+                                                org.clojure/tools.analyzer.jvm]]
+                                  [org.clojure/clojurescript "1.7.170"
+                                   :exclusions [org.clojure/clojure org.clojure/tools.reader]]
+                                  [org.clojure/tools.nrepl "0.2.12"]
+                                  [com.cemerick/piggieback "0.2.1"]
+                                  [devcards "0.2.0-8"
+                                   :exclusions [org.clojure/tools.reader]]
+                                  [pjstadig/humane-test-output "0.7.1"]
+                                  ]
 
-             ;; if you want to disable the REPL
-             ;; :repl false
+                   :source-paths ["env/dev/clj"]
+                   :plugins [[lein-figwheel "0.5.0-2"
+                              :exclusions [org.clojure/core.memoize
+                                           ring/ring-core
+                                           org.clojure/clojure
+                                           org.ow2.asm/asm-all
+                                           org.clojure/data.priority-map
+                                           org.clojure/tools.reader
+                                           org.clojure/clojurescript
+                                           org.clojure/core.async
+                                           org.clojure/tools.analyzer.jvm]]
+                             [org.clojure/clojurescript "1.7.170"]
+                             ]
 
-             ;; to configure a different figwheel logfile path
-             ;; :server-logfile "tmp/logs/figwheel-logfile.log" 
-             })
+                   :injections [(require 'pjstadig.humane-test-output)
+                                (pjstadig.humane-test-output/activate!)]
+
+                   :figwheel {:http-server-root "public"
+                              :server-port 3449
+                              :nrepl-port 7002
+                              :nrepl-middleware ["cemerick.piggieback/wrap-cljs-repl"
+                                                 ]
+                              :css-dirs ["resources/public/css"]
+                              :ring-handler looops.handler/app}
+
+                   :env {:dev true}
+
+                   :cljsbuild {:builds {:app {:source-paths ["env/dev/cljs"]
+                                              :compiler {:main "looops.dev"
+                                                         :source-map true}}
+
+                                        :devcards {:source-paths ["src/cljs" "src/cljc" "env/dev/cljs"]
+                                                   :figwheel {:devcards true}
+                                                   :compiler {:main "looops.cards"
+                                                              :asset-path "js/devcards_out"
+                                                              :output-to "target/cljsbuild/public/js/app_devcards.js"
+                                                              :output-dir "target/cljsbuild/public/js/devcards_out"
+                                                              :source-map-timestamp true}}
+                                        }
+
+                               }}
+
+             :uberjar {:hooks [minify-assets.plugin/hooks]
+                       :source-paths ["env/prod/clj"]
+                       :prep-tasks ["compile" ["cljsbuild" "once"]]
+                       :env {:production true}
+                       :aot :all
+                       :omit-source true
+                       :cljsbuild {:jar true
+                                   :builds {:app
+                                            {:source-paths ["env/prod/cljs"]
+                                             :compiler
+                                             {:optimizations :advanced
+                                              :pretty-print false}}}}}})
