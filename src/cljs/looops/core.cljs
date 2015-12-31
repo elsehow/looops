@@ -7,13 +7,16 @@
 ;; -------------------------
 ;; Views
 
+(defn menu []
+  [:ul
+   [:li [:a {:href "/"} "home"]]
+   [:li [:a {:href "/about"} "about"]]])
+
 (defn home-page []
-  [:div [:h2 "Welcome to looops"]
-   [:div [:a {:href "/about"} "go to about page"]]])
+  [:div [:h2 "Welcome to looops"]])
 
 (defn about-page []
-  [:div [:h2 "About looops"]
-   [:div [:a {:href "/"} "go to the home page"]]])
+  [:div [:h2 "About looops"]])
 
 (defn current-page []
   [:div [(session/get :current-page)]])
@@ -31,7 +34,11 @@
 ;; Initialize app
 
 (defn mount-root []
-  (reagent/render [current-page] (.getElementById js/document "app")))
+  (reagent/render
+   [:div
+    [menu]
+    [current-page]]
+   (.getElementById js/document "app")))
 
 (defn init! []
   (accountant/configure-navigation!)
