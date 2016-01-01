@@ -40,8 +40,8 @@
      url
      #(do
         (set-prop song :buffer %)
-        (set-prop song :loading false)
-        (start-song song)))))
+        (start-song song)
+        (set-prop song :loading false)))))
 
 (defn song-clicked [song]
   (let [{:keys [playing loading buffer]} @song]
