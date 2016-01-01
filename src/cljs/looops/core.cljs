@@ -10,13 +10,13 @@
 (defn menu []
   [:ul
    [:li [:a {:href "/"} "home"]]
-   [:li [:a {:href "/about"} "about"]]])
+   [:li [:a {:href "/upload"} "upload"]]])
 
 (defn home-page []
   [:div [:h2 "Welcome to looops"]])
 
-(defn about-page []
-  [:div [:h2 "About looops"]])
+(defn upload-page []
+  [:div [:h2 "upload looops"]])
 
 (defn current-page []
   [:div [(session/get :current-page)]])
@@ -27,8 +27,8 @@
 (secretary/defroute "/" []
   (session/put! :current-page #'home-page))
 
-(secretary/defroute "/about" []
-  (session/put! :current-page #'about-page))
+(secretary/defroute "/upload" []
+  (session/put! :current-page #'upload-page))
 
 ;; -------------------------
 ;; Initialize app
