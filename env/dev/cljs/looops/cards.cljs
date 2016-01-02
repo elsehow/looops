@@ -1,7 +1,7 @@
 (ns looops.cards
   (:require [reagent.core :as reagent :refer [atom]]
             [reagent.session :as session]
-            [looops.sounds :as sounds]
+            [looops.handlers :as handlers]
             [looops.core :as core])
   (:require-macros
    [devcards.core
@@ -15,43 +15,6 @@
                  :fade 1000
                  :url "music/1.wav"}))
 
-; song fuctions
-
-(defn set-prop [ratom prop val]
-  (swap! ratom assoc prop val))
-
-(defn stop-song [song]
-  (let [{:keys [audio-nodes fade]} @song]
-    (sounds/fade-out audio-nodes fade)
-    (set-prop song :playing false)))
-
-(defn start-song [song]
-  (let [{:keys [buffer fade]} @song
-        audio-nodes (sounds/make-audio-nodes buffer)]
-    (do
-     (set-prop song :audio-nodes audio-nodes)
-     (sounds/fade-in audio-nodes fade)
-     (set-prop song :playing true))))
-
-(defn load-then-play [song]
-  (let [{:keys [url]} @song]
-    (set-prop song :loading true)
-    (sounds/fetch-buffer
-     url
-     #(do
-        (set-prop song :buffer %)
-        (start-song song)
-        (set-prop song :loading false)))))
-
-(defn song-clicked [song]
-  (let [{:keys [playing loading buffer]} @song]
-    (cond
-      playing (stop-song song)
-      loading (println "its loading enhance your calm c:")
-      :else (if buffer
-              (start-song song)
-              (load-then-play song)))))
-
 ; song view
   
 (defn song-view [song]
@@ -61,7 +24,7 @@
                                   playing "green"
                                   loading "gray"
                                   :else "white")}
-      :on-click #(song-clicked song)}
+      :on-click #(handlers/song-clicked song)}
      name]))
 
 ;; song card

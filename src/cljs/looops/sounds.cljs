@@ -49,12 +49,11 @@
 
 (defn- start-source [source]
   (.start source 0))
-;
-;
-;(defn percent-played [buffer start-time]
-;  (let [duration (.-duration buffer)
-;        ago (- (now) start-time)]
-;    (-> ago (mod duration) (/ duration))))
+
+(defn percent-played [buffer start-time]
+  (let [duration (.-duration buffer)
+        ago (- (now) start-time)]
+    (-> ago (mod duration) (/ duration))))
 
 ; async fetch stuff
 
@@ -96,17 +95,16 @@
     (wire-nodes buffer gain)
     {:buffer-node buffer
      :gain-node gain}))
-        
-; TODO more drY?
 
 (defn fade-in [audio-nodes fade-time]
-  "Starts looping and fades in audio nodes {:gain-node :buffer-node}, over fade time"
   (let [{:keys [gain-node buffer-node]} audio-nodes]
     (start-source buffer-node)
     (fade-in-gain-node gain-node fade-time)))
 
-(defn fade-out [audio-nodes fade-time]
-  "Fades out audio nodes {:gain-node :buffer-node} and stops looping, over fade time"
+(defn fade-out [audio-nodes fade-time cb]
   (let [{:keys [gain-node buffer-node]} audio-nodes]
-    (js/setTimeout #(stop-source buffer-node) fade-time)
+    (js/setTimeout #(do
+                      (stop-source buffer-node)
+                      (cb))
+                   fade-time)
     (fade-out-gain-node gain-node fade-time)))
