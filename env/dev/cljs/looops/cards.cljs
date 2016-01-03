@@ -13,15 +13,17 @@
 (defonce song
   (reagent/atom {:name "yoooo"
                  :fade 1000
+                 :debug true            
                  :url "music/1.wav"}))
 
 ; song view
   
 (defn song-view [song]
-  (let [{:keys [name playing loading]} @song]
+  (let [{:keys [name playing fading loading]} @song]
     [:button
      {:style {:background-color (cond
                                   playing "green"
+                                  fading "aquamarine"
                                   loading "gray"
                                   :else "white")}
       :on-click #(handlers/song-clicked song)}
